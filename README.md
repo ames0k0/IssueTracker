@@ -16,6 +16,10 @@ python3 main.py
 ```
 
 ### Versions
+- **0.0.2**
+  - [ ] Code/Database documentations
+  - [ ] Handle missclick
+  - [ ] Detailed report/issue
 - **0.0.1**
   - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repository/project
   - [x] `/report` - Repost an issue by creating the GitHub issue to the repository/project
