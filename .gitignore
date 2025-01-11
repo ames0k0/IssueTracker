@@ -4,4 +4,5 @@
 *.sqlite3
 *.py[cod]
 __pycache__
-*.env-*
+*.env-local
+*.env-docker

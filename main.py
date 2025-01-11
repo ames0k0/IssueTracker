@@ -214,7 +214,7 @@ async def report_handler(message: Message) -> None:
   issue = repository.create_issue(
     title=f"{tg_message_chat_title}/{tg_message_id}",
     body=f"[{tg_message_date}] - [{tg_mrtm_user_is_bot}] - [{tg_mrtm_user_id}]\n"
-         "//\n"
+         "---\n"
          f"[ChatPostURL]({tg_message_url}) - [ChatPostCommentURL]({tg_mrtm_message_url})"
   )
 

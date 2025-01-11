@@ -1,10 +1,24 @@
 # Issue Tracker
 
-Let the telegram users report/create an issue
+Let the community report/create an issues on GitHub
 
-<p align="center"><img src="./docs/readme/Diagram-Page-2.drawio.png" /></p>
+```bash
+# Set an Environment variables: $TG__TOKEN, $GH__TOKEN
+cp ./deploy/secrets/.env-local-EXAMPLE ./deploy/secrets/.env-local
+
+# Virtual Environment
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+
+# Run the program
+python3 main.py
+```
 
 #### Versions
 - 0.0.1
-  - [ ] `/report` - `github/user/project/issues/new/`
-    - `[datetime] [@TelegramUser]`
+  - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repository/project
+  - [x] `/report` - Repost an issue by creating the GitHub issue to the repository/project
+
+---
+[Project Diagram and Screenshots](./docs/readme/DAS.md)
