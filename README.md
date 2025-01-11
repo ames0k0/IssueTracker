@@ -2,6 +2,14 @@
 
 Let the community report/create an issues on GitHub
 
+<details>
+<summary>Developer Dependencies</summary>
+<pre>
+python3 -V        # Python 3.11.6
+sqlite3 -version  # 3.42.0 2023-05-16 12:36:15 831d0f...
+</pre>
+</details>
+
 ```bash
 # Set an Environment variables: $TG__TOKEN, $GH__TOKEN
 cp ./deploy/secrets/.env-local-EXAMPLE ./deploy/secrets/.env-local
@@ -16,7 +24,7 @@ python3 main.py
 ```
 
 ### Versions
-- **0.0.2**
+- **~~0.0.2~~**
   - [ ] Code/Database documentations
   - [ ] Handle missclick
   - [ ] Detailed report/issue
