@@ -15,8 +15,8 @@ pip install -r requirements.txt
 python3 main.py
 ```
 
-#### Versions
-- 0.0.1
+### Versions
+- **0.0.1**
   - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repository/project
   - [x] `/report` - Repost an issue by creating the GitHub issue to the repository/project
 

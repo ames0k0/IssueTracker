@@ -264,7 +264,7 @@ if __name__ == "__main__":
 
   DB_FILE = STATIC_DIR / "db.sqlite3"
 
-  if not os.environ.get("BOT__TOKEN"):
+  if not os.environ.get("TG__TOKEN"):
     load_dotenv("deploy/secrets/.env-local")
 
   github = Github(
