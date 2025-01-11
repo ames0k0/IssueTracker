@@ -202,7 +202,7 @@ async def report_handler(message: Message) -> None:
   project_issue = curr.fetchone()
   if project_issue:
     await message.reply(
-      f"[!] An Issue already has been created at: {project_issue[0]}",
+      f"[!] GitHub Issue already has been created at: {project_issue[0]}",
     )
     return
 
@@ -253,7 +253,7 @@ async def report_handler(message: Message) -> None:
   )
   conn.commit()
 
-  await message.reply(f"[!] Created an Issue at: {issue.html_url}")
+  await message.reply(f"[!] GitHub Issue created at: {issue.html_url}")
 
 
 if __name__ == "__main__":
