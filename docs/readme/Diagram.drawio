@@ -1,0 +1,65 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.4 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.4">
+  <diagram name="Page-1" id="NsUzddbs9p70or8kZhok">
+    <mxGraphModel dx="598" dy="729" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="R2owunQEgLAnWQz2HYs--9" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--1" target="R2owunQEgLAnWQz2HYs--8">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--1" value="TelegramPost" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="200" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--2" value="Redis" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="600" y="80" width="80" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--4" target="R2owunQEgLAnWQz2HYs--1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--4" target="R2owunQEgLAnWQz2HYs--2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--4" value="FSM Storage" style="whiteSpace=wrap;html=1;rounded=0;fillColor=#a20025;fontColor=#ffffff;strokeColor=#6F0000;" vertex="1" parent="1">
+          <mxGeometry x="360" y="80" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--8" target="R2owunQEgLAnWQz2HYs--18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--8" value="/report&lt;div&gt;-&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;TGPost.&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;MessageID&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- TGUserName / ID&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;- TGMessageDate&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="360" y="280" width="120" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--18" target="R2owunQEgLAnWQz2HYs--23">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="420" />
+              <mxPoint x="500" y="220" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--18" target="R2owunQEgLAnWQz2HYs--28">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--18" value="PyGithub.create()&lt;div&gt;- IssueID&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="360" y="400" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--23" target="R2owunQEgLAnWQz2HYs--2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--23" value="&lt;div&gt;Reports:TGPost.MessageID =&lt;/div&gt;&lt;div&gt;{&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;&quot;TGUserName / ID&quot;: TGMessageDate&lt;/span&gt;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;}&lt;/span&gt;&lt;/div&gt;" style="whiteSpace=wrap;html=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="520" y="200" width="240" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--31" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="R2owunQEgLAnWQz2HYs--28" target="R2owunQEgLAnWQz2HYs--2">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="780" y="270" />
+              <mxPoint x="780" y="100" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="R2owunQEgLAnWQz2HYs--28" value="IssueID:TGPost.MessageID = IssueID" style="whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="260" width="240" height="20" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
