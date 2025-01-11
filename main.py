@@ -11,9 +11,10 @@ from aiogram import Bot, Dispatcher, html
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
-from aiogram.types import Message, BufferedInputFile, CallbackQuery
+from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
+from github import Github, Auth
 
 from dotenv import load_dotenv
 
@@ -53,7 +54,9 @@ async def handle_github_url(
     return
 
   project_id = state_data["project_id"]
-  project_name = parsed_url.path.split("/")[-1]
+  project_name = "/".join(
+    tuple(filter(bool, parsed_url.path.split("/", maxsplit=3)))[:2]
+  )
 
   curr.execute(
     """
@@ -112,7 +115,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       """,
       (
         message.reply_to_message.message_id,
-        message.reply_to_message.date.strftime("%Y-%m-%d %H:%M:%S"),
+        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
       )
@@ -134,7 +137,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       """,
       (
         message.reply_to_message.message_id,
-        message.reply_to_message.date.strftime("%Y-%m-%d %H:%M:%S"),
+        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
         project_id,
@@ -152,10 +155,110 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 
 @dp.message(Command("report"))
 async def report_handler(message: Message) -> None:
-  pass
+  # NOTE
+  # - Single issue per `tg_mrtm_message_id`
+
+  # XXX: next version
+  # - set the MAX issue "REAL" (not report) for the `tg_mrtm_message_id`
+  curr.execute(
+    """
+    SELECT id, gh_project_name FROM projects WHERE tg_mrtm_sender_chat_id = ?
+    """,
+    (message.reply_to_message.sender_chat.id,)
+  )
+  project = curr.fetchone()
+  if project is None:
+    await message.reply(
+      "[?] Project is not registered for the chat: "
+      f"{html.bold(message.reply_to_message.sender_chat.title)}\n"
+      "[!] Bot/Admin only /start"
+    )
+    return
+
+  project_id, gh_project_name = project
+  tg_mrtm_message_id = message.reply_to_message.message_id
+  tg_mrtm_user_id = message.from_user.id
+  tg_mrtm_user_is_bot = message.from_user.is_bot
+  tg_message_id = message.message_id
+  tg_message_date = message.date.strftime(MESSAGE_DT_FORMAT)
+  tg_message_chat_title = message.chat.title
+
+  curr.execute(
+    """
+    SELECT
+      gh_issue_html_url
+    FROM
+      project_issues
+    WHERE
+      project_id = ?
+    AND
+      tg_mrtm_message_id = ?
+    """,
+    (
+      project_id,
+      tg_mrtm_message_id,
+    )
+  )
+  project_issue = curr.fetchone()
+  if project_issue:
+    await message.reply(
+      f"[!] An Issue already has been created at: {project_issue[0]}",
+    )
+    return
+
+  tg_chat_url = f"https://t.me/{message.reply_to_message.sender_chat.username}"
+  tg_message_url = f"{tg_chat_url}/{tg_mrtm_message_id}"
+  tg_mrtm_message_url = f"{tg_message_url}?comment={tg_message_id}"
+
+  repository = github.get_repo(gh_project_name)
+  issue = repository.create_issue(
+    title=f"{tg_message_chat_title}/{tg_message_id}",
+    body=f"[{tg_message_date}] - [{tg_mrtm_user_is_bot}] - [{tg_mrtm_user_id}]\n"
+         "//\n"
+         f"[ChatPostURL]({tg_message_url}) - [ChatPostCommentURL]({tg_mrtm_message_url})"
+  )
+
+  curr.execute(
+    """
+    INSERT INTO
+      project_issues (
+        project_id,
+        tg_mrtm_message_id,
+        tg_mrtm_message_url,
+        tg_mrtm_user_id,
+        tg_mrtm_user_is_bot,
+        tg_message_id,
+        tg_message_url,
+        tg_message_date,
+        gh_issue_id,
+        gh_issue_html_url,
+        gh_issue_created_at
+      )
+    VALUES
+      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """,
+    (
+      project_id,
+      tg_mrtm_message_id,
+      tg_mrtm_message_url,
+      tg_mrtm_user_id,
+      tg_mrtm_user_is_bot,
+      tg_message_id,
+      tg_message_url,
+      tg_message_date,
+      issue.id,
+      issue.html_url,
+      issue.created_at.strftime(MESSAGE_DT_FORMAT),
+    )
+  )
+  conn.commit()
+
+  await message.reply(f"[!] Created an Issue at: {issue.html_url}")
 
 
 if __name__ == "__main__":
+  MESSAGE_DT_FORMAT = "%Y-%m-%d %H:%M:%S"
+
   STATIC_DIR = Path("./static")
   STATIC_DIR.mkdir(exist_ok=True)
 
@@ -163,6 +266,10 @@ if __name__ == "__main__":
 
   if not os.environ.get("BOT__TOKEN"):
     load_dotenv("deploy/secrets/.env-local")
+
+  github = Github(
+    auth=Auth.Token(os.environ.get("GH__TOKEN"))
+  )
 
   conn = sqlite3.connect(DB_FILE)
   curr = conn.cursor()
@@ -183,12 +290,18 @@ if __name__ == "__main__":
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS project_issues (
-      id                        INTEGER PRIMARY KEY AUTOINCREMENT,
-      tg_report_post_message_id INTEGER,
-      tg_report_message_id      INTEGER,
-      tg_report_message_dt      TEXT,
-      tg_user_id                BIGINT,
-      gh_issue_id               INT
+      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id          INTEGER,
+      tg_mrtm_message_id  INTEGER,
+      tg_mrtm_message_url TEXT,
+      tg_mrtm_user_id     BIGINT,
+      tg_mrtm_user_is_bot BOOLEAN,
+      tg_message_id       INT,
+      tg_message_url      TEXT,
+      tg_message_date     TEXT,
+      gh_issue_id         INT,
+      gh_issue_html_url   TEXT,
+      gh_issue_created_at TEXT
     )
     """
   )
