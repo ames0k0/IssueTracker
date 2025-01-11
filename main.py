@@ -104,7 +104,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       """
       INSERT INTO
         projects (
-          tg_mrtm_message_id,
+          tg_mrtm_fo_message_id,
           tg_mrtm_date,
           tg_mrtm_sender_chat_id,
           tg_mrtm_sender_chat_title
@@ -114,7 +114,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       )
       """,
       (
-        message.reply_to_message.message_id,
+        message.reply_to_message.forward_origin.message_id,
         message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
@@ -128,7 +128,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       UPDATE
         projects
       SET
-        tg_mrtm_message_id = ?,
+        tg_mrtm_fo_message_id = ?,
         tg_mrtm_date = ?,
         tg_mrtm_sender_chat_id = ?,
         tg_mrtm_sender_chat_title = ?
@@ -136,7 +136,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
         id = ?
       """,
       (
-        message.reply_to_message.message_id,
+        message.reply_to_message.forward_origin.message_id,
         message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
@@ -156,10 +156,10 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 @dp.message(Command("report"))
 async def report_handler(message: Message) -> None:
   # NOTE
-  # - Single issue per `tg_mrtm_message_id`
+  # - Single issue per `tg_mrtm_fo_message_id`
 
   # XXX: next version
-  # - set the MAX issue "REAL" (not report) for the `tg_mrtm_message_id`
+  # - set the MAX issue "REAL" (not report) for the `tg_mrtm_fo_message_id`
   curr.execute(
     """
     SELECT id, gh_project_name FROM projects WHERE tg_mrtm_sender_chat_id = ?
@@ -176,7 +176,7 @@ async def report_handler(message: Message) -> None:
     return
 
   project_id, gh_project_name = project
-  tg_mrtm_message_id = message.reply_to_message.message_id
+  tg_mrtm_fo_message_id = message.reply_to_message.forward_origin.message_id
   tg_mrtm_user_id = message.from_user.id
   tg_mrtm_user_is_bot = message.from_user.is_bot
   tg_message_id = message.message_id
@@ -192,11 +192,11 @@ async def report_handler(message: Message) -> None:
     WHERE
       project_id = ?
     AND
-      tg_mrtm_message_id = ?
+      tg_mrtm_fo_message_id = ?
     """,
     (
       project_id,
-      tg_mrtm_message_id,
+      tg_mrtm_fo_message_id,
     )
   )
   project_issue = curr.fetchone()
@@ -207,7 +207,7 @@ async def report_handler(message: Message) -> None:
     return
 
   tg_chat_url = f"https://t.me/{message.reply_to_message.sender_chat.username}"
-  tg_message_url = f"{tg_chat_url}/{tg_mrtm_message_id}"
+  tg_message_url = f"{tg_chat_url}/{tg_mrtm_fo_message_id}"
   tg_mrtm_message_url = f"{tg_message_url}?comment={tg_message_id}"
 
   repository = github.get_repo(gh_project_name)
@@ -223,7 +223,7 @@ async def report_handler(message: Message) -> None:
     INSERT INTO
       project_issues (
         project_id,
-        tg_mrtm_message_id,
+        tg_mrtm_fo_message_id,
         tg_mrtm_message_url,
         tg_mrtm_user_id,
         tg_mrtm_user_is_bot,
@@ -239,7 +239,7 @@ async def report_handler(message: Message) -> None:
     """,
     (
       project_id,
-      tg_mrtm_message_id,
+      tg_mrtm_fo_message_id,
       tg_mrtm_message_url,
       tg_mrtm_user_id,
       tg_mrtm_user_is_bot,
@@ -278,7 +278,7 @@ if __name__ == "__main__":
     """
     CREATE TABLE IF NOT EXISTS projects (
       id                        INTEGER PRIMARY KEY AUTOINCREMENT,
-      tg_mrtm_message_id        INTEGER,
+      tg_mrtm_fo_message_id     INTEGER,
       tg_mrtm_date              TEXT,
       tg_mrtm_sender_chat_id    BIGINT,
       tg_mrtm_sender_chat_title TEXT,
@@ -290,18 +290,18 @@ if __name__ == "__main__":
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS project_issues (
-      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-      project_id          INTEGER,
-      tg_mrtm_message_id  INTEGER,
-      tg_mrtm_message_url TEXT,
-      tg_mrtm_user_id     BIGINT,
-      tg_mrtm_user_is_bot BOOLEAN,
-      tg_message_id       INT,
-      tg_message_url      TEXT,
-      tg_message_date     TEXT,
-      gh_issue_id         INT,
-      gh_issue_html_url   TEXT,
-      gh_issue_created_at TEXT
+      id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id            INTEGER,
+      tg_mrtm_fo_message_id INTEGER,
+      tg_mrtm_message_url   TEXT,
+      tg_mrtm_user_id       BIGINT,
+      tg_mrtm_user_is_bot   BOOLEAN,
+      tg_message_id         INT,
+      tg_message_url        TEXT,
+      tg_message_date       TEXT,
+      gh_issue_id           INT,
+      gh_issue_html_url     TEXT,
+      gh_issue_created_at   TEXT
     )
     """
   )
