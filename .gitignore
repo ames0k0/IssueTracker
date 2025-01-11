@@ -1,1 +1,7 @@
 .idea
+.venv
+*.bkp
+*.sqlite3
+*.py[cod]
+__pycache__
+*.env-*

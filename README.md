@@ -2,7 +2,7 @@
 
 Let the telegram users report/create an issue
 
-<p align="center"><img src="./docs/readme/Diagram.drawio.png" /></p>
+<p align="center"><img src="./docs/readme/Diagram-Page-2.drawio.png" /></p>
 
 #### Versions
 - 0.0.1
