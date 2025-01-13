@@ -7,7 +7,7 @@ from enum import Enum
 from pathlib import Path
 from urllib.parse import urlparse
 
-from aiogram import Bot, Dispatcher, html
+from aiogram import Bot, Dispatcher, html, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command
@@ -94,9 +94,11 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 
   curr.execute(
     """
-    SELECT id FROM projects WHERE tg_mrtm_sender_chat_id = ?
+    SELECT id FROM projects WHERE tg_channel_id = ?
     """,
-    (message.reply_to_message.sender_chat.id,)
+    (
+      message.reply_to_message.sender_chat.id,
+    )
   )
   project = curr.fetchone()
   if not project:
@@ -104,20 +106,20 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       """
       INSERT INTO
         projects (
-          tg_mrtm_fo_message_id,
-          tg_mrtm_date,
-          tg_mrtm_sender_chat_id,
-          tg_mrtm_sender_chat_title
+          tg_channel_id,
+          tg_channel_title,
+          tg_channel_post_url,
+          tg_channel_post_date
         )
       VALUES (
         ?, ?, ?, ?
       )
       """,
       (
-        message.reply_to_message.forward_origin.message_id,
-        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
+        message.reply_to_message.get_url(force_private=True),
+        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
       )
     )
     project_id = curr.lastrowid
@@ -128,18 +130,18 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
       UPDATE
         projects
       SET
-        tg_mrtm_fo_message_id = ?,
-        tg_mrtm_date = ?,
-        tg_mrtm_sender_chat_id = ?,
-        tg_mrtm_sender_chat_title = ?
+        tg_channel_id = ?,
+        tg_channel_title = ?
+        tg_channel_post_url = ?,
+        tg_channel_post_date = ?
       WHERE
         id = ?
       """,
       (
-        message.reply_to_message.forward_origin.message_id,
-        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         message.reply_to_message.sender_chat.id,
         message.reply_to_message.sender_chat.title,
+        message.reply_to_message.get_url(force_private=True),
+        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
         project_id,
       )
     )
@@ -273,17 +275,16 @@ if __name__ == "__main__":
 
   conn = sqlite3.connect(DB_FILE)
   curr = conn.cursor()
-
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS projects (
-      id                        INTEGER PRIMARY KEY AUTOINCREMENT,
-      tg_mrtm_fo_message_id     INTEGER,
-      tg_mrtm_date              TEXT,
-      tg_mrtm_sender_chat_id    BIGINT,
-      tg_mrtm_sender_chat_title TEXT,
-      gh_project_url            TEXT,
-      gh_project_name           TEXT
+      id                    INTEGER PRIMARY KEY AUTOINCREMENT,
+      tg_channel_id         BIGINT,
+      tg_channel_title      TEXT,
+      tg_channel_post_url   TEXT,
+      tg_channel_post_date  TEXT,
+      gh_project_url        TEXT,
+      gh_project_name       TEXT
     )
     """
   )
