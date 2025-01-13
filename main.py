@@ -40,7 +40,7 @@ async def handle_github_url(
   if not message.from_user.is_bot:
     return
   state_data = await state.get_data()
-  if message.reply_to_message.message_id != state_data["bot_message_id"]:
+  if message.reply_to_message.message_id != state_data.get("bot_message_id"):
     return
   url = message.text.strip()
   parsed_url = urlparse(url)
@@ -53,7 +53,7 @@ async def handle_github_url(
     await message.delete()
     return
 
-  project_id = state_data["project_id"]
+  project_id = state_data.get("project_id")
   project_name = "/".join(
     tuple(filter(bool, parsed_url.path.split("/", maxsplit=3)))[:2]
   )
@@ -124,6 +124,7 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
     )
     project_id = curr.lastrowid
   else:
+    raise NotImplementedError('Depr')
     project_id = project[0]
     curr.execute(
       """
@@ -157,18 +158,28 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
 
 @dp.message(Command("report"))
 async def report_handler(message: Message) -> None:
-  # NOTE
-  # - Single issue per `tg_mrtm_fo_message_id`
+  # XXX: FEAT:
+  # - set the MAX issue "REAL" (not report) for the `tg_channel_post_url`
 
-  # XXX: next version
-  # - set the MAX issue "REAL" (not report) for the `tg_mrtm_fo_message_id`
+  if not message.reply_to_message.sender_chat:
+    await message.reply("Comment to the post to `/report`")
+    return
+
   curr.execute(
     """
-    SELECT id, gh_project_name FROM projects WHERE tg_mrtm_sender_chat_id = ?
+    SELECT
+      id, tg_channel_title, gh_project_name
+    FROM
+      projects
+    WHERE
+      tg_channel_id = ?
     """,
-    (message.reply_to_message.sender_chat.id,)
+    (
+      message.reply_to_message.sender_chat.id,
+    )
   )
   project = curr.fetchone()
+  # NOTE: checking any project is registered for the `channel`
   if project is None:
     await message.reply(
       "[?] Project is not registered for the chat: "
@@ -177,13 +188,13 @@ async def report_handler(message: Message) -> None:
     )
     return
 
-  project_id, gh_project_name = project
-  tg_mrtm_fo_message_id = message.reply_to_message.forward_origin.message_id
-  tg_mrtm_user_id = message.from_user.id
-  tg_mrtm_user_is_bot = message.from_user.is_bot
-  tg_message_id = message.message_id
+  project_id, tg_channel_title, gh_project_name = project
+
+  tg_user_id = message.from_user.id
+  tg_user_is_bot = message.from_user.is_bot
+  tg_message_url = message.get_url(force_private=True)
   tg_message_date = message.date.strftime(MESSAGE_DT_FORMAT)
-  tg_message_chat_title = message.chat.title
+  tg_channel_post_url = message.reply_to_message.get_url(force_private=True)
 
   curr.execute(
     """
@@ -194,30 +205,31 @@ async def report_handler(message: Message) -> None:
     WHERE
       project_id = ?
     AND
-      tg_mrtm_fo_message_id = ?
+      tg_channel_post_url = ?
     """,
     (
+      # XXX: `tg_channel_post_url` is unique, no need to filter by `project_id`
       project_id,
-      tg_mrtm_fo_message_id,
+      tg_channel_post_url,
     )
   )
   project_issue = curr.fetchone()
+  # NOTE: checking if any issue is registered for the `channel_post`
   if project_issue:
     await message.reply(
       f"[!] GitHub Issue already has been created at: {project_issue[0]}",
     )
     return
 
-  tg_chat_url = f"https://t.me/{message.reply_to_message.sender_chat.username}"
-  tg_message_url = f"{tg_chat_url}/{tg_mrtm_fo_message_id}"
-  tg_mrtm_message_url = f"{tg_message_url}?comment={tg_message_id}"
-
   repository = github.get_repo(gh_project_name)
+
+  # ChannelTitle / ChannelPostTitle / message_id
   issue = repository.create_issue(
-    title=f"{tg_message_chat_title}/{tg_message_id}",
-    body=f"[{tg_message_date}] - [{tg_mrtm_user_is_bot}] - [{tg_mrtm_user_id}]\n"
-         "---\n"
-         f"[ChatPostURL]({tg_message_url}) - [ChatPostCommentURL]({tg_mrtm_message_url})"
+    title=f"{tg_channel_title} / {message.chat.title} / {message.message_id}",
+    body=\
+      f"[{tg_message_date}] - [{tg_user_is_bot}] - [{tg_user_id}]\n"
+      "---\n"
+      f"[ChannelPostURL]({tg_channel_post_url}) - [ChannelPostCommentURL]({tg_message_url})"
   )
 
   curr.execute(
@@ -225,29 +237,25 @@ async def report_handler(message: Message) -> None:
     INSERT INTO
       project_issues (
         project_id,
-        tg_mrtm_fo_message_id,
-        tg_mrtm_message_url,
-        tg_mrtm_user_id,
-        tg_mrtm_user_is_bot,
-        tg_message_id,
+        tg_user_id,
+        tg_user_is_bot,
         tg_message_url,
         tg_message_date,
+        tg_channel_post_url,
         gh_issue_id,
         gh_issue_html_url,
         gh_issue_created_at
       )
     VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """,
     (
       project_id,
-      tg_mrtm_fo_message_id,
-      tg_mrtm_message_url,
-      tg_mrtm_user_id,
-      tg_mrtm_user_is_bot,
-      tg_message_id,
+      tg_user_id,
+      tg_user_is_bot,
       tg_message_url,
       tg_message_date,
+      tg_channel_post_url,
       issue.id,
       issue.html_url,
       issue.created_at.strftime(MESSAGE_DT_FORMAT),
@@ -281,8 +289,13 @@ if __name__ == "__main__":
       id                    INTEGER PRIMARY KEY AUTOINCREMENT,
       tg_channel_id         BIGINT,
       tg_channel_title      TEXT,
+
+      -- I may not need this here
+      -- Project is registered for the `channel_id`
+      -- I'll keep in case project will be registered to `channel_post_url`
       tg_channel_post_url   TEXT,
       tg_channel_post_date  TEXT,
+
       gh_project_url        TEXT,
       gh_project_name       TEXT
     )
@@ -291,18 +304,19 @@ if __name__ == "__main__":
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS project_issues (
-      id                    INTEGER PRIMARY KEY AUTOINCREMENT,
-      project_id            INTEGER,
-      tg_mrtm_fo_message_id INTEGER,
-      tg_mrtm_message_url   TEXT,
-      tg_mrtm_user_id       BIGINT,
-      tg_mrtm_user_is_bot   BOOLEAN,
-      tg_message_id         INT,
-      tg_message_url        TEXT,
-      tg_message_date       TEXT,
-      gh_issue_id           INT,
-      gh_issue_html_url     TEXT,
-      gh_issue_created_at   TEXT
+      id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+      project_id          INTEGER,
+      tg_user_id          BIGINT,
+      tg_user_is_bot      BOOLEAN,
+      tg_message_url      TEXT,
+      tg_message_date     TEXT,
+
+      -- issue per post, use to filter
+      tg_channel_post_url TEXT,
+
+      gh_issue_id         INT,
+      gh_issue_html_url   TEXT,
+      gh_issue_created_at TEXT
     )
     """
   )

@@ -1,0 +1,93 @@
+{
+  "message_id": 327,
+  "date": 1736730595,
+  "chat": {
+    "id": -1002176290202,
+    "type": "supergroup",
+    "title": "Title Diff Chat"
+  },
+  "message_thread_id": 299,
+  "from_user": {
+    "id": 1087968824,
+    "is_bot": true,
+    "first_name": "Group",
+    "username": "GroupAnonymousBot"
+  },
+  "sender_chat": {
+    "id": -1002176290202,
+    "type": "supergroup",
+    "title": "Title Diff Chat"
+  },
+  "reply_to_message": {
+    "message_id": 299,
+    "date": 1736727767,
+    "chat": {
+      "id": -1002176290202,
+      "type": "supergroup",
+      "title": "Title Diff Chat"
+    },
+    "from_user": {
+      "id": 777000,
+      "is_bot": false,
+      "first_name": "Telegram"
+    },
+    "sender_chat": {
+      "id": -1002471158929,
+      "type": "channel",
+      "title": "Title Diff",
+      "username": "TitleDiff"
+    },
+    "forward_origin": {
+      "date": 1736727764,
+      "chat": {
+        "id": -1002471158929,
+        "type": "channel",
+        "title": "Title Diff",
+        "username": "TitleDiff"
+      },
+      "message_id": 24
+    },
+    "is_automatic_forward": true,
+    "photo": [
+      {
+        "file_id": "AgACAgIAAyEFAASBt42aAAIBKWeEWtFDN77OLNeTC3n4IMDXazUhAAIV7zEbWR4gSKkjYi9PyWExAQADAgADcwADNgQ",
+        "file_unique_id": "AQADFe8xG1keIEh4",
+        "width": 63,
+        "height": 90,
+        "file_size": 2208
+      },
+      {
+        "file_id": "AgACAgIAAyEFAASBt42aAAIBKWeEWtFDN77OLNeTC3n4IMDXazUhAAIV7zEbWR4gSKkjYi9PyWExAQADAgADbQADNgQ",
+        "file_unique_id": "AQADFe8xG1keIEhy",
+        "width": 183,
+        "height": 260,
+        "file_size": 23944
+      }
+    ],
+    "caption": "+ Красный рейнджер становится искателем приключений в другом мире [1-1 из 12]\n- testing",
+    "caption_entities": [
+      {
+        "type": "pre",
+        "offset": 0,
+        "length": 87,
+        "language": "diff"
+      }
+    ],
+    "forward_date": 1736727764,
+    "forward_from_chat": {
+      "id": -1002471158929,
+      "type": "channel",
+      "title": "Title Diff",
+      "username": "TitleDiff"
+    },
+    "forward_from_message_id": 24
+  },
+  "text": "/start",
+  "entities": [
+    {
+      "type": "bot_command",
+      "offset": 0,
+      "length": 6
+    }
+  ]
+}
