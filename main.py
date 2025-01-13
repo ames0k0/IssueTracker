@@ -101,54 +101,36 @@ async def command_start_handler(message: Message, state: FSMContext) -> None:
     )
   )
   project = curr.fetchone()
-  if not project:
-    curr.execute(
-      """
-      INSERT INTO
-        projects (
-          tg_channel_id,
-          tg_channel_title,
-          tg_channel_post_url,
-          tg_channel_post_date
-        )
-      VALUES (
-        ?, ?, ?, ?
-      )
-      """,
-      (
-        message.reply_to_message.sender_chat.id,
-        message.reply_to_message.sender_chat.title,
-        message.reply_to_message.get_url(force_private=True),
-        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
-      )
+  if project:
+    await message.reply(
+      f"[!] Project(id={project[0]}) already has been created!"
     )
-    project_id = curr.lastrowid
-  else:
-    raise NotImplementedError('Depr')
-    project_id = project[0]
-    curr.execute(
-      """
-      UPDATE
-        projects
-      SET
-        tg_channel_id = ?,
-        tg_channel_title = ?
-        tg_channel_post_url = ?,
-        tg_channel_post_date = ?
-      WHERE
-        id = ?
-      """,
-      (
-        message.reply_to_message.sender_chat.id,
-        message.reply_to_message.sender_chat.title,
-        message.reply_to_message.get_url(force_private=True),
-        message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
-        project_id,
+    await state.clear()
+    return
+
+  curr.execute(
+    """
+    INSERT INTO
+      projects (
+        tg_channel_id,
+        tg_channel_title,
+        tg_channel_post_url,
+        tg_channel_post_date
       )
+    VALUES (
+      ?, ?, ?, ?
     )
+    """,
+    (
+      message.reply_to_message.sender_chat.id,
+      message.reply_to_message.sender_chat.title,
+      message.reply_to_message.get_url(force_private=True),
+      message.reply_to_message.date.strftime(MESSAGE_DT_FORMAT),
+    )
+  )
   conn.commit()
 
-  await state.update_data(project_id=project_id)
+  await state.update_data(project_id=curr.lastrowid)
   await state.update_data(admin_message_id=message.message_id)
 
   message = await message.reply("Reply GitHub/Project URL")
@@ -162,7 +144,7 @@ async def report_handler(message: Message) -> None:
   # - set the MAX issue "REAL" (not report) for the `tg_channel_post_url`
 
   if not message.reply_to_message.sender_chat:
-    await message.reply("Comment to the post to `/report`")
+    await message.reply("Comment to the channel post to `/report`")
     return
 
   curr.execute(
