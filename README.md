@@ -2,6 +2,12 @@
 
 Let the community report/create an issues on GitHub
 
+##### Brief: [Project Diagram and Screenshots](./docs/readme/DAS.md)
+```
+/start  - Register github project to the channel
+/report - Report the channel post
+```
+
 <details>
 <summary>Developer Dependencies</summary>
 <pre>
@@ -34,6 +40,3 @@ python3 main.py
 - **0.0.1**
   - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repository/project
   - [x] `/report` - Repost an issue by creating the GitHub issue to the repository/project
-
----
-[Project Diagram and Screenshots](./docs/readme/DAS.md)
