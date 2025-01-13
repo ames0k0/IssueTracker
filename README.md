@@ -2,14 +2,18 @@
 
 Let the community report/create an issues on GitHub
 
-##### Brief: [Project Diagram and Screenshots](./docs/readme/DAS.md)
+> [!NOTE]
+> Run commands in the Telegram Channel Discussion\
+> Brief: [Project Diagram and Screenshots](./docs/readme/DAS.md)
+
 ```
-/start  - Register github project to the channel
-/report - Report the channel post
+/start  - Link GitHub repository with Telegram Channel
+/report - Create an issue on GitHub
 ```
 
+---
 <details>
-<summary>Developer Dependencies</summary>
+<summary>Dependencies</summary>
 <pre>
 python3 -V        # Python 3.11.6
 sqlite3 -version  # 3.42.0 2023-05-16 12:36:15 831d0f...
@@ -29,7 +33,7 @@ pip install -r requirements.txt
 python3 main.py
 ```
 
-### Versions
+#### Versions
 - **~~0.0.2~~**
   - [ ] Code/Database documentations
   - [ ] Handle missclick
@@ -38,5 +42,5 @@ python3 main.py
   - [x] Remove registered project update https://github.com/ames0k0/IssueTracker/issues/18
   - [x] Update tables, Remove custom urls https://github.com/ames0k0/IssueTracker/issues/19 
 - **0.0.1**
-  - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repo
-  - [x] `/report` - Repost an issue by creating the GitHub issue to the repo
+  - [x] `/start` - Link GitHub repository with Telegram Channel
+  - [x] `/report` - Create an issue on GitHub
