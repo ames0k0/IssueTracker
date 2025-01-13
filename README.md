@@ -35,8 +35,8 @@ python3 main.py
   - [ ] Handle missclick
   - [ ] Detailed report/issue
 - **0.0.5**
-  - [x] Changes for: Issue #18
-  - [x] Update tables: Issue #19
+  - [x] Remove registered project update https://github.com/ames0k0/IssueTracker/issues/18
+  - [x] Update tables, Remove custom urls https://github.com/ames0k0/IssueTracker/issues/19 
 - **0.0.1**
-  - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repository/project
-  - [x] `/report` - Repost an issue by creating the GitHub issue to the repository/project
+  - [x] `/start` - Register `Telegram Channel Discussion` to a GitHub repo
+  - [x] `/report` - Repost an issue by creating the GitHub issue to the repo
