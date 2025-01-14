@@ -15,6 +15,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from github import Github, Auth
+from github.GithubException import UnknownObjectException
 
 from dotenv import load_dotenv
 
@@ -46,7 +47,7 @@ async def handle_github_url(
   parsed_url = urlparse(url)
   if parsed_url.netloc != SupportedCodeHubs.github.value:
     fail_msg = await message.reply(
-      f"[?] Not supported: {parsed_url.netloc or url}! Try again..."
+      f"[?] Not supported: {parsed_url.netloc or url}"
     )
     await asyncio.sleep(1.5)
     await fail_msg.delete()
@@ -54,23 +55,34 @@ async def handle_github_url(
     return
 
   project_id = state_data.get("project_id")
-  project_name = "/".join(
+  gh_repository_full_name = "/".join(
     tuple(filter(bool, parsed_url.path.split("/", maxsplit=3)))[:2]
   )
+  try:
+    repository = github.get_repo(gh_repository_full_name)
+  except UnknownObjectException:
+    fail_msg = await message.reply(
+      f"[?] Repository ({gh_repository_full_name}) is not found "
+      "or you have no access!"
+    )
+    await asyncio.sleep(2.5)
+    await fail_msg.delete()
+    await message.delete()
+    return
 
   curr.execute(
     """
     UPDATE
       projects
     SET
-      gh_project_url = ?,
-      gh_project_name = ?
+      gh_repository_url = ?,
+      gh_repository_full_name = ?
     WHERE
       id = ?
     """,
     (
-      url,
-      project_name,
+      repository.html_url,
+      gh_repository_full_name,
       project_id,
     )
   )
@@ -150,7 +162,7 @@ async def report_handler(message: Message) -> None:
   curr.execute(
     """
     SELECT
-      id, tg_channel_title, gh_project_name
+      id, tg_channel_title, gh_repository_full_name
     FROM
       projects
     WHERE
@@ -170,7 +182,7 @@ async def report_handler(message: Message) -> None:
     )
     return
 
-  project_id, tg_channel_title, gh_project_name = project
+  project_id, tg_channel_title, gh_repository_full_name = project
 
   tg_user_id = message.from_user.id
   tg_user_is_bot = message.from_user.is_bot
@@ -203,7 +215,14 @@ async def report_handler(message: Message) -> None:
     )
     return
 
-  repository = github.get_repo(gh_project_name)
+  try:
+    repository = github.get_repo(gh_repository_full_name)
+  except UnknownObjectException:
+    await message.reply(
+      f"[?] Repository ({gh_repository_full_name}) is not found "
+      "or you have no access!"
+    )
+    return
 
   # ChannelTitle / ChannelPostTitle / message_id
   issue = repository.create_issue(
@@ -268,18 +287,18 @@ if __name__ == "__main__":
   curr.execute(
     """
     CREATE TABLE IF NOT EXISTS projects (
-      id                    INTEGER PRIMARY KEY AUTOINCREMENT,
-      tg_channel_id         BIGINT,
-      tg_channel_title      TEXT,
+      id                      INTEGER PRIMARY KEY AUTOINCREMENT,
+      tg_channel_id           BIGINT,
+      tg_channel_title        TEXT,
 
       -- I may not need this here
       -- Project is registered for the `channel_id`
       -- I'll keep in case project will be registered to `channel_post_url`
-      tg_channel_post_url   TEXT,
-      tg_channel_post_date  TEXT,
+      tg_channel_post_url     TEXT,
+      tg_channel_post_date    TEXT,
 
-      gh_project_url        TEXT,
-      gh_project_name       TEXT
+      gh_repository_url       TEXT,
+      gh_repository_full_name TEXT
     )
     """
   )
