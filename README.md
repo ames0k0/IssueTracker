@@ -4,7 +4,7 @@ Let the community report/create an issues on GitHub
 
 > [!NOTE]
 > Run commands in the Telegram Channel Discussion\
-> Brief: [Project Diagram and Screenshots](./docs/readme/DAS.md)
+> Brief: [Project Diagram and Screenshots](./docs/readme/DAS.md) (`Wiki` is enabled)
 
 ```
 /start  - Link GitHub repository with Telegram Channel
