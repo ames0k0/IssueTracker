@@ -8,7 +8,7 @@
 sqlite> .tables
 project_issues  projects
 sqlite> select * from projects;
-1|-1002471158929|Title Diff|https://t.me/c/2176290202/299|2025-01-13 00:22:47|https://github.com/ames0k0/IssueTracker/issues/19|ames0k0/IssueTracker
+1|-1002471158929|TitleDiff|https://t.me/c/2176290202/416|2025-01-13 20:00:03|https://github.com/ames0k0/IssueTracker|ames0k0/IssueTracker
 sqlite> select * from project_issues ;
-2|1|1087968824|1|https://t.me/c/2176290202/343|2025-01-13 13:08:36|https://t.me/c/2176290202/299|2783918864|https://github.com/ames0k0/IssueTracker/issues/21|2025-01-13 13:08:37
+1|1|1087968824|1|https://t.me/c/2176290202/431|2025-01-14 01:17:00|https://t.me/c/2176290202/416|2785897737|https://github.com/ames0k0/IssueTracker/issues/26|2025-01-14 01:17:00
 ```
